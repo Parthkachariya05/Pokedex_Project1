@@ -5,23 +5,41 @@ import Pokemon from '../Pokemon/Pokemon'
 
 export default function PokemonList() {
 
-    const [pokemonList, setPokemonList] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
+    // const [pokemonList, setPokemonList] = useState([])
+    // const [isLoading, setIsLoading] = useState(true)
 
-    const [pokeexUrl, setPokedexUrl] = useState('https://pokeapi.co/api/v2/pokemon')
+    // const [pokedexUrl, setPokedexUrl] = useState('https://pokeapi.co/api/v2/pokemon')
 
-    // const POKEDEX_URL = 'https://pokeapi.co/api/v2/pokemon'
 
-    const [nextUrl, setNextUrl] = useState('')
-    const [preUrl, setPreUrl] = useState('')
+    // const [nextUrl, setNextUrl] = useState('')
+    // const [preUrl, setPreUrl] = useState('')
+
+
+    // Advance useState
+
+    const [pokemonListState, setPokemonListState] = useState({
+        pokemonList: [],
+        isLoading: true,
+        pokedexUrl: 'https://pokeapi.co/api/v2/pokemon',
+        nextUrl: '',
+        preUrl: ''
+    })
 
     async function downloadPokemons() {
-        setIsLoading(true)
-        const response = await axios.get(pokeexUrl) // this downloads list of 20 pokemons
+        // setIsLoading(true)
+        setPokemonListState({ ...pokemonListState, isLoading: true })
+
+        const response = await axios.get(pokemonListState.pokedexUrl) // this downloads list of 20 pokemons
         console.log(response.data)
 
-        setNextUrl(response.data.next)
-        setPreUrl(response.data.previous)
+        // setNextUrl(response.data.next)
+        // setPreUrl(response.data.previous)
+        setPokemonListState(state => ({
+                ...state,
+                nextUrl: response.data.next,
+                preUrl: response.data.previous
+            }))
+
 
         const pokemonResults = response.data.results  // we get the array of pokemons from results
         console.log(pokemonResults)
@@ -49,14 +67,20 @@ export default function PokemonList() {
         })
 
         console.log(pokeListResult)
-        setPokemonList(pokeListResult)
+        // setPokemonList(pokeListResult)
+        // setIsLoading(false)
+        setPokemonListState(state => ({
+            ...state,
+            pokemonList: pokeListResult,  // Fixed typo: was pokemonlist
+            isLoading: false
+        })
+        )
 
-        setIsLoading(false)
     }
 
     useEffect(() => {
         downloadPokemons()
-    }, [pokeexUrl])    // [] hoga to pahli baar load hoga tabhi execute hoga  // [x] x ke lye hoga 
+    }, [pokemonListState.pokedexUrl])    // [] hoga to pahli baar load hoga tabhi execute hoga  // [x] x ke lye hoga 
 
 
 
@@ -65,17 +89,17 @@ export default function PokemonList() {
 
             <div className='pokemon-wrapper'>
                 {
-                    (isLoading)
+                    (pokemonListState.isLoading)
                         ?
                         'Loading....'
                         :
-                        pokemonList.map((p) => <Pokemon name={p.name} image={p.image} key={p.id} id={p.id}/>)
+                        pokemonListState.pokemonList.map((p) => <Pokemon name={p.name} image={p.image} key={p.id} id={p.id} types={p.types} />)
                 }
             </div>
 
             <div className='controls'>
-                <button disabled={preUrl == null} onClick={() => setPokedexUrl(preUrl)}>Prev</button>
-                <button disabled={nextUrl == null} onClick={() => setPokedexUrl(nextUrl)}>Next</button>
+                <button disabled={pokemonListState.preUrl == null} onClick={() => setPokemonListState({ ...pokemonListState, pokedexUrl: pokemonListState.preUrl })}>Prev</button>
+                <button disabled={pokemonListState.nextUrl == null} onClick={() => setPokemonListState({ ...pokemonListState, pokedexUrl: pokemonListState.nextUrl })}>Next</button>
             </div>
 
         </div>
