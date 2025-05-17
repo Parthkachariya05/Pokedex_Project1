@@ -5,13 +5,13 @@ import './PokemonDetails.css'
 import usePokemonList from '../../hooks/usePokemonList';
 import usePokemonDetails from '../../hooks/usePokemonDetails';
 
-export default function PokemonDetails() {
+export default function PokemonDetails({ pokemonName }) {
 
     const { id } = useParams();   // useparams se url ka variable nikal sakte ho jese ki id
 
 
 
-    const [pokemon] = usePokemonDetails(id)
+    const [pokemon] = usePokemonDetails(id, pokemonName)
 
 
     return (
@@ -42,7 +42,7 @@ export default function PokemonDetails() {
                 <div>
                     more {pokemon.types[0]} type pokemons
                     <ul>
-                        {pokemon.similarPokemons.map((p) => <li key={p.pokemon.id}>{p.pokemon.name}</li>)}
+                        {pokemon.similarPokemons.map((p) => <li key={p.pokemon.url}>{p.pokemon.name}</li>)}
                     </ul>
                 </div>
             }

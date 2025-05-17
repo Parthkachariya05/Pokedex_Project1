@@ -3,33 +3,41 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import usePokemonList from './usePokemonList';
 
-export default function usePokemonDetails(id) {
+export default function usePokemonDetails(id, pokemonName) {
 
     const [pokemon, setPokemon] = useState({})
 
     async function downloadPokemon() {
+        try {
+            let response;
 
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
+            if (pokemonName) {
+                response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
 
-        const pokemonOfSameTypes = await axios.get(`https://pokeapi.co/api/v2/type/${response.data.types ? response.data.types[0].type.name : ''}`)
+            }
+            else {
+                response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
+            }
 
-        setPokemon((state) => ({
-            ...state,
-            name: response.data.name,
-            image: response.data.sprites.other.dream_world.front_default,
-            weight: response.data.weight,
-            height: response.data.height,
-            types: response.data.types.map((t) => t.type.name),
-            similarPokemons: pokemonOfSameTypes.data.pokemon.slice(0, 5)
-        }))
 
-        pokemonOfSameTypes.then((response) => {
+            const pokemonOfSameTypes = await axios.get(`https://pokeapi.co/api/v2/type/${response.data.types ? response.data.types[0].type.name : ''}`)
+
             setPokemon((state) => ({
                 ...state,
-                similarPokemons: response.data.pokemon
+                name: response.data.name,
+                image: response.data.sprites.other.dream_world.front_default,
+                weight: response.data.weight,
+                height: response.data.height,
+                types: response.data.types.map((t) => t.type.name),
+                similarPokemons: pokemonOfSameTypes.data.pokemon.slice(0, 5)
             }))
-        })
-        setPokemonListState({ ...pokemonListState, type: response.data.types ? response.data.types[0].type.name : '' })
+
+
+            setPokemonListState({ ...pokemonListState, type: response.data.types ? response.data.types[0].type.name : '' })
+        } catch (error) {
+                console.log("Something went wrong")
+        }
+
     }
 
     const [pokemonListState, setPokemonListState] = usePokemonList()
@@ -37,7 +45,7 @@ export default function usePokemonDetails(id) {
 
     useEffect(() => {
         downloadPokemon()
-        console.log("list", pokemonListState)
+        // console.log("list", pokemonListState)
     }, [])
 
     return [pokemon]

@@ -22,7 +22,7 @@ export default function usePokemonList() {
         setPokemonListState({ ...pokemonListState, isLoading: true })
 
         const response = await axios.get(pokemonListState.pokedexUrl) // this downloads list of 20 pokemons
-        console.log(response.data)
+        // console.log(response.data)
 
         const pokemonResults = response.data.results  // we get the array of pokemons from results
         console.log("response is ", response.data.pokemon)
@@ -39,7 +39,7 @@ export default function usePokemonList() {
         const pokemonResultPromise = pokemonResults.map((pokemon => axios.get(pokemon.url)))
 
         const pokemonData = await axios.all(pokemonResultPromise)  // array of 20 pokemon detailed data
-        console.log(pokemonData)
+       
 
 
 
@@ -55,7 +55,7 @@ export default function usePokemonList() {
             }
         })
 
-        console.log(pokeListResult)
+     
 
         setPokemonListState(state => ({
             ...state,
